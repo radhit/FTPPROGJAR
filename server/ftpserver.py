@@ -24,7 +24,7 @@ class Server:
     
     def run(self):
         self.open_socket()
-        input = [self.server, sys.stdin]
+        input = [self.server]
         running = 1
         print 'On', local_ip, ':', local_port
         
@@ -108,12 +108,14 @@ class FTPserverThread(threading.Thread):
             elif chwd[0]=='/':
                 self.cwd=os.path.join(self.basewd,chwd[1:])
                 self.conn.send('250 OK.\r\n')
-            else:
+            elif os.path.isdir(os.path.join(self.cwd,chwd)):
                 self.cwd=os.path.join(self.cwd,chwd)
+                self.conn.send('250 OK.\r\n')
+            else:
                 self.conn.send('530 GAGAL.\r\n')
         else:
             self.conn.send('Masukan Username dan Password dahulu')
-
+                
     def LIST(self,cmd):
         if self.flagu==1 and self.flagp==1:
             data = "\n"
@@ -208,19 +210,33 @@ class FTPserverThread(threading.Thread):
             self.conn.send('Masukan Username dan Password dahulu')
 
     def HELP(self,cmd):
-        cmdlist = ( "CWD    --  Mengubah direktori aktif\n"
-                    "QUIT   --  Keluar aplikasi\n"
-                    "RETR   --  Mengunduh file\n"
-                    "STOR   --  Mengunggah file\n"
-                    "RNFR   --  Mengganti nama file\n"
-                    "RNTO   --  Mengganti nama file\n"
-                    "DELE   --  Menghapus file\n"
-                    "RMD    --  Menghapus direktori\n"
-                    "MKD    --  Membuat direktori\n"
-                    "PWD    --  Mencetak direktori aktif\n"
-                    "LIST   --  Mendaftar file dan direktori\n"
-                    "HELP   --  Menampilkan daftar perintah\n")
-        self.conn.send(cmdlist)
+        result = ""
+        kata=cmd.split(" ")
+        if kata[0] == "HELP" and len(kata)==1:
+            result += "Komen yang di sediakan:\n"
+            result += "USER PASS CWD QUIT RETR STOR RNFR\n"
+            result += "RNTO DELE RMD MKD PWD LIST HELP\n"
+            result += "Selamat ^-^\r\n"
+        elif kata[1]!="":
+            tmp=kata[1].split("\r\n")
+            if tmp[0]=="USER" or tmp[0]=="PASS" or tmp[0]=="QUIT" or tmp[0]=="PWD" or tmp[0]=="LIST" or tmp[0]=="CWD" or tmp[0]=="RETR" or tmp[0]=="STOR" or tmp[0]=="RNFR" or tmp[0]=="RNTO" or tmp[0]=="DELE" or tmp[0]=="RMD" or tmp[0]=="MKD" or tmp[0]=="HELP":
+                result += tmp[0] + " is supported by FTProgjar Server.\r\n"
+        else:
+            result += tmp[0] + " is not recognized or supported by FTProgjar Server.\r\n"
+        self.conn.send(result)
+    
+        # cmdlist = ( "CWD    --  Mengubah direktori aktif\n"
+        #             "QUIT   --  Keluar aplikasi\n"
+        #             "RETR   --  Mengunduh file\n"
+        #             "STOR   --  Mengunggah file\n"
+        #             "RNFR   --  Mengganti nama file\n"
+        #             "RNTO   --  Mengganti nama file\n"
+        #             "DELE   --  Menghapus file\n"
+        #             "RMD    --  Menghapus direktori\n"
+        #             "MKD    --  Membuat direktori\n"
+        #             "PWD    --  Mencetak direktori aktif\n"
+        #             "LIST   --  Mendaftar file dan direktori\n"
+        #             "HELP   --  Menampilkan daftar perintah\n")
 
 if __name__=='__main__':
     s = Server()
