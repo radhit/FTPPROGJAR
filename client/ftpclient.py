@@ -19,37 +19,45 @@ while(1):
 		cmd = client.send(cmd+"\r\n")
 		data = client.recv(1024)
 		print data
+	
 	elif "PASS" in cmd:
 		password = cmd.split(" ")[1]
 		cmd = client.send(cmd+"\r\n")
 		data = client.recv(1024)
 		print data
+	
 	elif "RNFR" in cmd:
 		cmd = client.send(cmd+"\r\n")
 		data = client.recv(1024)
 		print data
+	
 	elif "RNTO" in cmd:
 		cmd = client.send(cmd+"\r\n")
 		data = client.recv(1024)
 		print data
+
 	elif "HELP" in cmd:
 		cmd = client.send(cmd+"\r\n")
 		data=client.recv(1024)
 		print data	
+	
 	elif "QUIT" in cmd:
 		cmd = client.send(cmd+"\r\n")
 		data = client.recv(1024)
 		print data
 		client.close()
 		exit()
+	
 	elif "DELE" in cmd:
 		cmd = client.send(cmd+"\r\n")
 		data = client.recv(1024)
 		print data
+	
 	elif "CWD" in cmd:
 		cmd = client.send(cmd+"\r\n")
 		data = client.recv(1024)
 		print data
+	
 	elif "PWD" in cmd:
 		cmd = client.send(cmd+"\r\n")
 		data = client.recv(1024)
@@ -72,6 +80,36 @@ while(1):
 		data = client.recv(1024)
 		print data
 
+	elif "STOR" in cmd:
+		name = cmd.split("STOR ")[1]
+		file_path = os.path.join(os.getcwd(),name.strip())
+		size = str(os.path.getsize(file_path))
+		cmd = client.send(cmd+"\r\n"+size)
+		fileopen = open(name,"rb")
+		data = fileopen.read(4096)
+		while (1):
+			if not data:
+				break
+			upload = client.send(data)
+			data = fileopen.read(4096)
+		fileopen.close()
+		data = client.recv(1024)
+		print data
+	
+	elif "RMD" in cmd:
+		cmd = client.send(cmd+"\r\n")
+		data = client.recv(1024)
+		print data
+	
+	elif "MKD" in cmd:
+		cmd = client.send(cmd+"\r\n")
+		data = client.recv(1024)
+		print data
+		
+	elif "LIST" in cmd:
+		cmd = client.send(cmd+"\r\n")
+		data = client.recv(1024)
+		print data
 
 
 
