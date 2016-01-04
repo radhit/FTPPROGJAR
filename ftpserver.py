@@ -120,6 +120,24 @@ class FTPserverThread(threading.Thread):
         else:
             self.conn.send('Masukan Username dan Password dahulu')
 
+    def RETR(self,cmd):
+        cmd1=cmd.split("\r\n")
+        name=cmd1[0].split("RETR ")[1]
+        file_path = os.path.join(os.getcwd(),name.strip())
+        print 'Downloading:',file_path
+        size = str(os.path.getsize(file_path))        
+        self.conn.send(size)
+        fileopen = open(name,"rb")
+        data = fileopen.read(1024)
+        while (1):
+            if not data:
+                break
+            self.conn.send(data)
+            data = fileopen.read(1024)
+        fileopen.close()
+        print 'done\r\n'
+        self.conn.send('226 Transfer complete.\r\n')
+
 class FTPserver(threading.Thread):
     def __init__(self):
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)

@@ -55,6 +55,22 @@ while(1):
 		data = client.recv(1024)
 		print data
 
+	elif "RETR" in cmd:
+		name = cmd.split("RETR ")[1]
+		print name
+		cmd = client.send(cmd+"\r\n")
+		size = client.recv(1024)
+		fileopen = open(name,'wb')
+		isi = ""
+		while (1):
+			if (len(isi))>=int(size):
+				break
+			else:
+				isi+=client.recv(1024)
+		fileopen.write(isi)
+		fileopen.close()
+		data = client.recv(1024)
+		print data
 
 
 
