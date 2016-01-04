@@ -27,32 +27,20 @@ class Server:
         input = [self.server, sys.stdin]
         running = 1
         print 'On', local_ip, ':', local_port
-        raw_input('Enter to end...\n')
         
         while running:
             inputready,outputready,exceptready = select.select(input,[],[])
-            #self.conn.send('Masuk Fungsi Run!\r\n')
-            print "mlebu"
             for s in inputready:
                 if s == self.server:
-                    # handle the server socket
                     c = FTPserverThread(self.server.accept())
-                    print s
-                    #self.conn.send('Masuk Fungsi Run1!\r\n')
                     c.start()
-                    #self.conn.send('Masuk Fungsi Run2!\r\n')
                     self.threads.append(c)
                 elif s == sys.stdin:
-                    # handle standard input
                     junk = sys.stdin.readline()
                     running = 0
-        # close all threads
         self.server.close()
         for c in self.threads:
             c.join()
-
-    def stop(self):
-        self.sock.close()
 
 class FTPserverThread(threading.Thread):
     def __init__(self,(conn,addr)):
@@ -87,7 +75,6 @@ class FTPserverThread(threading.Thread):
             self.conn.send('331 OK.\r\n')
         else:
             self.conn.send('530 sorry.\r\n Masukan Username yang benar.\r\n')
-            #raise SystemExit
 
     def PASS(self,cmd):
         password=cmd.strip().split()[1]
@@ -96,12 +83,10 @@ class FTPserverThread(threading.Thread):
             self.conn.send('331 OK.\r\n')
         else:
             self.conn.send('530 sorry.\r\n Masukan Password yang benar.\r\n')
-            #raise SystemExit
 
     
     def QUIT(self,cmd):
         self.conn.send('221 Goodbye.\r\n')
-        # self.conn.close()
 
     def PWD(self,cmd):
         if self.flagu==1 and self.flagp==1:
@@ -133,7 +118,6 @@ class FTPserverThread(threading.Thread):
         if self.flagu==1 and self.flagp==1:
             data = "\n"
             for filename in os.listdir(self.cwd):
-                # print filename
                 data = data + filename + "\n"
             self.conn.send(data)
         else:
