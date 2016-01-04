@@ -82,6 +82,20 @@ class FTPserverThread(threading.Thread):
                     "HELP   --  Menampilkan daftar perintah\n")
         self.conn.send(cmdlist)
 
+    def QUIT(self,cmd):
+        self.conn.send('221 Goodbye.\r\n')
+    
+    def DELE(self,cmd):
+        if self.flagu==1 and self.flagp==1:
+            fn=os.path.join(self.cwd,cmd[5:-2])
+            if allow_delete:
+                os.remove(fn)
+                self.conn.send('250 File deleted.\r\n')
+            else:
+                self.conn.send('450 Not allowed.\r\n')
+        else:
+            self.conn.send('Masukan Username dan Password dahulu')
+
 
 class FTPserver(threading.Thread):
     def __init__(self):

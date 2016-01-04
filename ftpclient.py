@@ -36,6 +36,16 @@ while(1):
 		cmd = client.send(cmd+"\r\n")
 		data=client.recv(1024)
 		print data	
+	elif "QUIT" in cmd:
+		cmd = client.send(cmd+"\r\n")
+		data = client.recv(1024)
+		print data
+		client.close()
+		exit()
+	elif "DELE" in cmd:
+		cmd = client.send(cmd+"\r\n")
+		data = client.recv(1024)
+		print data
 
 
 
