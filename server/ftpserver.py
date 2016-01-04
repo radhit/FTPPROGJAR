@@ -7,6 +7,47 @@ local_ip = "127.0.0.1"
 local_port = 8000
 currdir=os.path.abspath('.')
 
+class Server:
+    def __init__(self):
+        self.host = 'localhost'
+        self.port = 8000
+        self.backlog = 5
+        self.size = 1024
+        self.server = None
+        self.threads = []
+
+    def open_socket(self):
+        self.server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        self.server.bind((self.host,self.port))
+        self.server.listen(5)
+    
+    def run(self):
+        self.open_socket()
+        input = [self.server, sys.stdin]
+        running = 1
+        print 'aaaa'
+        while running:
+            inputready,outputready,exceptready = select.select(input,[],[])
+            #self.conn.send('Masuk Fungsi Run!\r\n')
+            print "mlebu"
+            for s in inputready:
+                if s == self.server:
+                    # handle the server socket
+                    c = FTPserverThread(self.server.accept())
+                    print s
+                    #self.conn.send('Masuk Fungsi Run1!\r\n')
+                    c.start()
+                    #self.conn.send('Masuk Fungsi Run2!\r\n')
+                    self.threads.append(c)
+                elif s == sys.stdin:
+                    # handle standard input
+                    junk = sys.stdin.readline()
+                    running = 0
+        # close all threads
+        self.server.close()
+        for c in self.threads:
+            c.join()
 
 class FTPserverThread(threading.Thread):
     def __init__(self,(conn,addr)):
@@ -210,9 +251,15 @@ class FTPserver(threading.Thread):
         self.sock.close()
 
 if __name__=='__main__':
+    s = Server()
+    s.run()
+
+'''
     ftp=FTPserver()
     ftp.daemon=True
     ftp.start()
+    
     print 'On', local_ip, ':', local_port
     raw_input('Enter to end...\n')
     ftp.stop()
+'''
