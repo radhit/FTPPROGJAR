@@ -46,6 +46,14 @@ while(1):
 		cmd = client.send(cmd+"\r\n")
 		data = client.recv(1024)
 		print data
+	elif "CWD" in cmd:
+		cmd = client.send(cmd+"\r\n")
+		data = client.recv(1024)
+		print data
+	elif "PWD" in cmd:
+		cmd = client.send(cmd+"\r\n")
+		data = client.recv(1024)
+		print data
 
 
 

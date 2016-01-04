@@ -96,6 +96,29 @@ class FTPserverThread(threading.Thread):
         else:
             self.conn.send('Masukan Username dan Password dahulu')
 
+    def CWD(self,cmd):
+        if self.flagu==1 and self.flagp==1:
+            chwd=cmd[4:-2]
+            if chwd=='/':
+                self.cwd=self.basewd
+            elif chwd[0]=='/':
+                self.cwd=os.path.join(self.basewd,chwd[1:])
+            else:
+                self.cwd=os.path.join(self.cwd,chwd)
+            self.conn.send('250 OK.\r\n')
+        else:
+            self.conn.send('Masukan Username dan Password dahulu')
+
+    def PWD(self,cmd):
+        if self.flagu==1 and self.flagp==1:
+            cwd=os.path.relpath(self.cwd,self.basewd)
+            if cwd=='.':
+                cwd='/'
+            else:
+                cwd='/'+cwd
+            self.conn.send('257 \"%s\"\r\n' % cwd)
+        else:
+            self.conn.send('Masukan Username dan Password dahulu')
 
 class FTPserver(threading.Thread):
     def __init__(self):
