@@ -1,5 +1,5 @@
 import os,socket,threading,time
-import subprocess
+import subprocess,sys,select
 
 allow_delete = True
 #local_ip = socket.gethostbyname(socket.gethostname())
@@ -9,8 +9,8 @@ currdir=os.path.abspath('.')
 
 class Server:
     def __init__(self):
-        self.host = 'localhost'
-        self.port = 8000
+        self.host = local_ip
+        self.port = local_port
         self.backlog = 5
         self.size = 1024
         self.server = None
@@ -26,7 +26,9 @@ class Server:
         self.open_socket()
         input = [self.server, sys.stdin]
         running = 1
-        print 'aaaa'
+        print 'On', local_ip, ':', local_port
+        raw_input('Enter to end...\n')
+        
         while running:
             inputready,outputready,exceptready = select.select(input,[],[])
             #self.conn.send('Masuk Fungsi Run!\r\n')
@@ -48,6 +50,9 @@ class Server:
         self.server.close()
         for c in self.threads:
             c.join()
+
+    def stop(self):
+        self.sock.close()
 
 class FTPserverThread(threading.Thread):
     def __init__(self,(conn,addr)):
@@ -233,33 +238,6 @@ class FTPserverThread(threading.Thread):
                     "HELP   --  Menampilkan daftar perintah\n")
         self.conn.send(cmdlist)
 
-
-class FTPserver(threading.Thread):
-    def __init__(self):
-        self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.sock.bind((local_ip,local_port))
-        threading.Thread.__init__(self)
-
-    def run(self):
-        self.sock.listen(5)
-        while True:
-            th=FTPserverThread(self.sock.accept())
-            th.daemon=True
-            th.start()
-
-    def stop(self):
-        self.sock.close()
-
 if __name__=='__main__':
     s = Server()
     s.run()
-
-'''
-    ftp=FTPserver()
-    ftp.daemon=True
-    ftp.start()
-    
-    print 'On', local_ip, ':', local_port
-    raw_input('Enter to end...\n')
-    ftp.stop()
-'''
