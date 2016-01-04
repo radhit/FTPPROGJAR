@@ -2,7 +2,6 @@ import os,socket,threading,time
 import subprocess,sys,select
 
 allow_delete = True
-#local_ip = socket.gethostbyname(socket.gethostname())
 local_ip = "127.0.0.1"
 local_port = 8000
 currdir=os.path.abspath('.')
@@ -11,7 +10,6 @@ class Server:
     def __init__(self):
         self.host = local_ip
         self.port = local_port
-        self.backlog = 5
         self.size = 1024
         self.server = None
         self.threads = []
@@ -57,7 +55,7 @@ class FTPserverThread(threading.Thread):
     def run(self):
         self.conn.send('220 Welcome!\r\n')
         while True:
-            cmd=self.conn.recv(512)
+            cmd=self.conn.recv(1024)
             if not cmd: break
             else:
                 print 'Recieved:',cmd
@@ -72,7 +70,7 @@ class FTPserverThread(threading.Thread):
         user=cmd.strip().split()[1]
         if user == "joke":
             self.flagu = 1
-            self.conn.send('331 OK.\r\n')
+            self.conn.send('230 USERNAME BENAR.\r\n')
         else:
             self.conn.send('530 sorry.\r\n Masukan Username yang benar.\r\n')
 
@@ -80,7 +78,7 @@ class FTPserverThread(threading.Thread):
         password=cmd.strip().split()[1]
         if password == "fun":
             self.flagp = 1
-            self.conn.send('331 OK.\r\n')
+            self.conn.send('230 PASSWORD BENAR.\r\n')
         else:
             self.conn.send('530 sorry.\r\n Masukan Password yang benar.\r\n')
 
@@ -224,19 +222,6 @@ class FTPserverThread(threading.Thread):
         else:
             result += tmp[0] + " is not recognized or supported by FTProgjar Server.\r\n"
         self.conn.send(result)
-    
-        # cmdlist = ( "CWD    --  Mengubah direktori aktif\n"
-        #             "QUIT   --  Keluar aplikasi\n"
-        #             "RETR   --  Mengunduh file\n"
-        #             "STOR   --  Mengunggah file\n"
-        #             "RNFR   --  Mengganti nama file\n"
-        #             "RNTO   --  Mengganti nama file\n"
-        #             "DELE   --  Menghapus file\n"
-        #             "RMD    --  Menghapus direktori\n"
-        #             "MKD    --  Membuat direktori\n"
-        #             "PWD    --  Mencetak direktori aktif\n"
-        #             "LIST   --  Mendaftar file dan direktori\n"
-        #             "HELP   --  Menampilkan daftar perintah\n")
 
 if __name__=='__main__':
     s = Server()
