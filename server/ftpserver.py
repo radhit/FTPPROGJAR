@@ -53,10 +53,11 @@ class FTPserverThread(threading.Thread):
         self.flagp = 0
 
     def run(self):
-        self.conn.send('220 Welcome!\r\n')
+        self.conn.send('220 Selamat Datang!\r\nSilahkan Masukan USERNAME dan PASSWORD jika ingin menggunakan semua command kecuali HELP dan QUIT.\r\nCommand HELP jika ingin mengetahui list command yang tersedia')
         while True:
             cmd=self.conn.recv(1024)
-            if not cmd: break
+            if not cmd: 
+                break
             else:
                 print 'Recieved:',cmd
                 try:
@@ -64,13 +65,13 @@ class FTPserverThread(threading.Thread):
                     func(cmd)
                 except Exception,e:
                     print 'ERROR:',e
-                    self.conn.send('500 Sorry.\r\n')
+                    self.conn.send('202 Command tidak tersedia di FTProgjar')
 
     def USER(self,cmd):
         user=cmd.strip().split()[1]
         if user == "joke":
             self.flagu = 1
-            self.conn.send('230 USERNAME BENAR.\r\n')
+            self.conn.send('331 USERNAME BENAR MASUKKAN PASSWORD dengan command PASS "password_anda".\r\n')
         else:
             self.conn.send('530 sorry.\r\n Masukan Username yang benar.\r\n')
 
@@ -78,13 +79,13 @@ class FTPserverThread(threading.Thread):
         password=cmd.strip().split()[1]
         if password == "fun":
             self.flagp = 1
-            self.conn.send('230 PASSWORD BENAR.\r\n')
+            self.conn.send('230 PASSWORD BENAR.\r\Selamat Datang Joke!')
         else:
             self.conn.send('530 sorry.\r\n Masukan Password yang benar.\r\n')
 
     
     def QUIT(self,cmd):
-        self.conn.send('221 Goodbye.\r\n')
+        self.conn.send('221 Selamat tinggal JOKE!.\r\n')
 
     def PWD(self,cmd):
         if self.flagu==1 and self.flagp==1:
@@ -218,9 +219,9 @@ class FTPserverThread(threading.Thread):
         elif kata[1]!="":
             tmp=kata[1].split("\r\n")
             if tmp[0]=="USER" or tmp[0]=="PASS" or tmp[0]=="QUIT" or tmp[0]=="PWD" or tmp[0]=="LIST" or tmp[0]=="CWD" or tmp[0]=="RETR" or tmp[0]=="STOR" or tmp[0]=="RNFR" or tmp[0]=="RNTO" or tmp[0]=="DELE" or tmp[0]=="RMD" or tmp[0]=="MKD" or tmp[0]=="HELP":
-                result += tmp[0] + " is supported by FTProgjar Server.\r\n"
-        else:
-            result += tmp[0] + " is not recognized or supported by FTProgjar Server.\r\n"
+                result += tmp[0] + " Terserdia pada FTProgjar Server.\r\n"
+            else:
+                result += tmp[0] + " Tidak tersedia pada FTProgjar Server.\r\n"
         self.conn.send(result)
 
 if __name__=='__main__':

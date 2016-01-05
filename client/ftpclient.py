@@ -109,6 +109,10 @@ while(1):
 		cmd = client.send(cmd+"\r\n")
 		data = client.recv(1024)
 		print data
+	else:
+		cmd = client.send(cmd+"\r\n")
+		data = client.recv(1024)
+		print data
 
 
 
